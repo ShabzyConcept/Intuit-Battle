@@ -8,6 +8,7 @@ import { Trophy, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { CommunityMember } from "@/types/database";
+import IntuitionButton from "@/components/intuition_button";
 
 const mockMembers = [
   {
@@ -291,6 +292,7 @@ export default function HomePage() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Trophy className="w-5 h-5 text-white" />
               </div>
+
               <h1 className="text-xl font-bold text-white">Intuit 👁️ Battle</h1>
             </div>
 
@@ -305,6 +307,7 @@ export default function HomePage() {
       <section className="py-16 px-4">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto space-y-6">
+            <IntuitionButton />
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
               <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Intuit 👁️</span> <span className="text-white">Battle</span>
             </h1>
