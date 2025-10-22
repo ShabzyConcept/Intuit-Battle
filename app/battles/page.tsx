@@ -7,8 +7,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { PaymentService } from "@/lib/payment-service";
+import { te } from "date-fns/locale";
 
-interface Battle {
+export interface Battle {
   id: string;
   title: string;
   description?: string;
@@ -196,33 +197,36 @@ export default function BattlesPage() {
 
       const txHash = await PaymentService.sendPayment(walletAddress, recipientAddress);
 
-      if (txHash) {
-        try {
-          const { error } = await supabase.from("battle_votes").upsert({
-            battle_id: Number.parseInt(battle.id),
-            vote_member_id: Number.parseInt(memberId),
-            voter_wallet_address: walletAddress,
-          });
+      console.log("Payment successful. Transaction hash:", txHash);
 
-          if (error) throw error;
-          await supabase.rpc("increment_vote_count_v2", {
-            battle_id: battle.id,
-          });
+      // if (false) {
+      //   try {
+      //     const { data, error } = await supabase.from("battle_votes").upsert({
+      //       battle_id: Number.parseInt(battle.id),
+      //       vote_member_id: Number.parseInt(memberId),
+      //       voter_wallet_address: walletAddress,
+      //     });
 
-          await supabase.rpc("rpc_increment_vote", {
-            p_battle_id: battle.id,
-            p_member_position: getMemberPosition(battle, memberId),
-          });
+      //     console.log("Vote upsert result:", { data, error });
+      //     if (error) throw error;
+      //     await supabase.rpc("increment_vote_count_v2", {
+      //       battle_id: battle.id,
+      //     });
 
-          await fetchBattles();
-          await fetchUserVotes();
-        } catch (error) {
-          console.error("Error voting:", error);
-          alert("Failed to submit vote. Please try again.");
-        } finally {
-          setIsVoting(false);
-        }
-      }
+      //     await supabase.rpc("rpc_increment_vote", {
+      //       p_battle_id: battle.id,
+      //       p_member_position: getMemberPosition(battle, memberId),
+      //     });
+
+      //     await fetchBattles();
+      //     await fetchUserVotes();
+      //   } catch (error) {
+      //     console.error("Error voting:", error);
+      //     alert("Failed to submit vote. Please try again.");
+      //   } finally {
+      //     setIsVoting(false);
+      //   }
+      // }
     } catch (error: any) {
       setIsVoting(false);
       console.log("Payment failed. Please try again.");
@@ -308,7 +312,7 @@ export default function BattlesPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {completedBattles.map((battle) => (
-                <BattleCard key={battle.id} battle={battle} userVote={userVotes[battle.id]} showVoteButtons={true} />
+                <BattleCard key={battle.id} battle={battle} onVote={handleVote} userVote={userVotes[battle.id]} showVoteButtons={isVoting} />
               ))}
             </div>
           </section>

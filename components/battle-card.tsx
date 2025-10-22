@@ -4,16 +4,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CountdownTimer } from "@/components/countdown-timer";
-import type { Battle } from "@/types/database";
+
 import { Clock, Users, Trophy } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Vote } from "@/app/battles/page";
+import { Battle, Vote } from "@/app/battles/page";
 
 interface BattleCardProps {
   battle: Battle;
-  onVote?: (battle: Battle, memberId: string) => void;
-  userVote?: Record<string, Vote>;
+  onVote?: (battle: Battle, memberId: string) => void | Promise<void>;
+  userVote?: Record<string, Vote> | Vote;
   isVoting?: boolean;
   showVoteButtons?: boolean;
 }

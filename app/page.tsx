@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { TopAgentsGrid } from "@/components/top-agents-grid"
-import { WalletConnect } from "@/components/wallet-connect"
-import { Button } from "@/components/ui/button"
-import { Trophy, Users, Zap } from "lucide-react"
-import Link from "next/link"
+import { useEffect, useState } from "react";
+import { TopAgentsGrid } from "@/components/top-agents-grid";
+import { WalletConnect } from "@/components/wallet-connect";
+import { Button } from "@/components/ui/button";
+import { Trophy, Users, Zap } from "lucide-react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { CommunityMember } from "@/types/database";
 
 const mockMembers = [
   {
@@ -242,19 +244,42 @@ const mockMembers = [
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
-]
+];
 
 export default function HomePage() {
-  const [walletAddress, setWalletAddress] = useState<string>("")
-  const [members, setMembers] = useState(mockMembers)
+  const supabase = createClient();
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [members, setMembers] = useState<CommunityMember[]>([]);
 
   const handleWalletConnect = (address: string) => {
-    setWalletAddress(address)
-  }
+    setWalletAddress(address);
+  };
 
   const handleWalletDisconnect = () => {
-    setWalletAddress("")
-  }
+    setWalletAddress("");
+  };
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      //  setLoading(true);
+      //  setError(null);
+
+      try {
+        const { data, error } = await supabase.from("community_members").select("*");
+
+        if (error) throw error;
+        if (data) {
+          setMembers(data);
+        }
+      } catch (err: any) {
+        //  setError(err.message || "Failed to fetch members");
+      } finally {
+        //  setLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -281,14 +306,10 @@ export default function HomePage() {
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto space-y-6">
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Intuit 👁️
-              </span>{" "}
-              <span className="text-white">Battle</span>
+              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Intuit 👁️</span> <span className="text-white">Battle</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Vote for your favorite community leaders and watch them compete in epic battles. Shape the future of our
-              community through democratic participation on the Intuition Network.
+              Vote for your favorite community leaders and watch them compete in epic battles. Shape the future of our community through democratic participation on the Intuition Network.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
@@ -299,11 +320,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/battles">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-gray-700 hover:border-blue-500 px-8 bg-transparent"
-                >
+                <Button size="lg" variant="outline" className="border-gray-700 hover:border-blue-500 px-8 bg-transparent">
                   <Zap className="w-5 h-5 mr-2" />
                   Watch Battles
                 </Button>
@@ -339,5 +356,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

@@ -35,7 +35,7 @@ export class PaymentService {
             from: fromAddress,
             to: toAddress,
             value: amountInWei,
-            gas: "0x5208", // 21000 gas for simple transfer
+            gas: "0x5208",
           },
         ],
       });
