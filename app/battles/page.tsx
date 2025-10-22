@@ -197,36 +197,34 @@ export default function BattlesPage() {
 
       const txHash = await PaymentService.sendPayment(walletAddress, recipientAddress);
 
-      console.log("Payment successful. Transaction hash:", txHash);
+      if (txHash) {
+        try {
+          const { data, error } = await supabase.from("battle_votes").upsert({
+            battle_id: Number.parseInt(battle.id),
+            vote_member_id: Number.parseInt(memberId),
+            voter_wallet_address: walletAddress,
+          });
 
-      // if (false) {
-      //   try {
-      //     const { data, error } = await supabase.from("battle_votes").upsert({
-      //       battle_id: Number.parseInt(battle.id),
-      //       vote_member_id: Number.parseInt(memberId),
-      //       voter_wallet_address: walletAddress,
-      //     });
+          console.log("Vote upsert result:", { data, error });
+          if (error) throw error;
+          await supabase.rpc("increment_vote_count_v2", {
+            battle_id: battle.id,
+          });
 
-      //     console.log("Vote upsert result:", { data, error });
-      //     if (error) throw error;
-      //     await supabase.rpc("increment_vote_count_v2", {
-      //       battle_id: battle.id,
-      //     });
+          await supabase.rpc("rpc_increment_vote", {
+            p_battle_id: battle.id,
+            p_member_position: getMemberPosition(battle, memberId),
+          });
 
-      //     await supabase.rpc("rpc_increment_vote", {
-      //       p_battle_id: battle.id,
-      //       p_member_position: getMemberPosition(battle, memberId),
-      //     });
-
-      //     await fetchBattles();
-      //     await fetchUserVotes();
-      //   } catch (error) {
-      //     console.error("Error voting:", error);
-      //     alert("Failed to submit vote. Please try again.");
-      //   } finally {
-      //     setIsVoting(false);
-      //   }
-      // }
+          await fetchBattles();
+          await fetchUserVotes();
+        } catch (error) {
+          console.error("Error voting:", error);
+          alert("Failed to submit vote. Please try again.");
+        } finally {
+          setIsVoting(false);
+        }
+      }
     } catch (error: any) {
       setIsVoting(false);
       console.log("Payment failed. Please try again.");
