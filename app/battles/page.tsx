@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { PaymentService } from "@/lib/payment-service";
-import { te } from "date-fns/locale";
 
 export interface Battle {
   id: string;
